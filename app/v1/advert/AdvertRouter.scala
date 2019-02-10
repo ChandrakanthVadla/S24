@@ -24,7 +24,7 @@ class AdvertRouter @Inject()(controller: AdvertController) extends SimpleRouter 
     }
     case GET(p"/$id") =>
     {
-      controller.show(id.toInt)
+      controller.show(id)
     }
 
     case POST(p"/") =>

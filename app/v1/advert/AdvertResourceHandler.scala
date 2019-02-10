@@ -16,7 +16,7 @@ import scala.language.postfixOps
 
 case class AdvertResource(id: Option[Int] = None, title: String, fuel: Fuel,
                           price:Long, isNew:Boolean, mileage: Option[Int],
-                          first_registration: Option[LocalDate])
+                          firstRegistration: Option[LocalDate])
 
 object AdvertResource {
 
@@ -32,7 +32,7 @@ object AdvertResource {
         "price" -> advert.price,
         "new" -> advert.isNew,
         "mileage" -> advert.mileage.getOrElse("").toString,
-        "first registration" -> advert.first_registration.getOrElse("").toString
+        "firstRegistration" -> advert.firstRegistration.getOrElse("").toString
       )
     }
   }

@@ -53,18 +53,24 @@ class AdvertController @Inject()(cc: AdvertControllerComponents)(
       case "title" | "fuel" | "price" | "new" => sortBy
       case _ => "id"
     }
-    println("SORTBY IS ", sort)
-    advertResourceHandler.listAll(sort).map { posts =>
-      Ok(Json.toJson(posts))
+    advertResourceHandler.listAll(sort).map { response =>
+      Ok(Json.toJson(response))
     }
   }
 
 
-  def show(id: Int): Action[AnyContent] = AdvertAction.async {
+  def show(id: String): Action[AnyContent] = AdvertAction.async {
     implicit request =>
       logger.trace(s"show: id = $id")
-      advertResourceHandler.lookup(id).map { advert =>
-        Ok(Json.toJson(advert))
+
+      val idInt:Int = if(!id.isEmpty && (id forall Character.isDigit)) id.toInt else -1
+
+      advertResourceHandler.lookup(idInt).map{ response =>
+        val re = response match {
+          case Some(x) => Json.toJson(x)
+          case None => Json.toJson("Id not Found")
+        }
+        Ok(Json.toJson(re) )
       }
   }
 
