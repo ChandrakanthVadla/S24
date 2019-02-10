@@ -33,7 +33,7 @@ class AdvertRouter @Inject()(controller: AdvertController) extends SimpleRouter 
     }
     case PUT(p"/$id") =>
     {
-      controller.show(id.toInt)
+      controller.update(id.toInt)
     }
     case DELETE(p"/$id") =>
     {

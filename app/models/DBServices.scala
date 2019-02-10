@@ -113,7 +113,11 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
   def select(id: Int): Future[Option[Advert]] =
     db.run(carAds.filter(_.id === id).take(1).result.headOption)
 
-  override  def update(id: Int, row: Advert): Future[Int] = db.run(carAds.filter(_.id === id).update(row))
+  override  def update(id: Int, row: Advert): Future[Int] = {
+    println("Inside DBSERvices with ", id)
+    val r:Advert = Advert(Option(id), row.title, row.fuel,row.price, row.`new`, row.mileage, row.firstRegistration)
+    db.run(carAds.filter(_.id === id).update(r))
+  }
 
   override  def delete(id: Int): Future[Int] = db.run(carAds.filter(_.id === id).delete)
 

@@ -59,7 +59,6 @@ class AdvertResourceHandler @Inject()(
   }
 
   def listAll(sort:String = "id")(implicit mc: MarkerContext): Future[Iterable[AdvertResource]] = {
-    print("Inside find of AdvertResourceHandler")
     val modelAdvertList:Seq[models.Advert] = Await.result(dbservices.listAll(sort) , Duration.Inf)
     Future.successful( (modelAdvertList.map(a => createAdvertResource(a))).toIterable )
   }
@@ -70,8 +69,11 @@ class AdvertResourceHandler @Inject()(
 
   def add(advertInput: Advert)(
     implicit mc: MarkerContext): Future[Int] = {
-    println(("Inside Handler with "))
     dbservices.add(advertInput)
+  }
+  def update(id:Int, advertInput: Advert)(
+    implicit mc: MarkerContext): Future[Int] = {
+    dbservices.update(id,advertInput)
   }
   private def createAdvertResource(a: Advert): AdvertResource = {
     AdvertResource( a.id, a.title, a.fuel, a.price, a.`new`, a.mileage, a.firstRegistration)

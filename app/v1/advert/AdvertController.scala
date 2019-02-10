@@ -78,7 +78,6 @@ class AdvertController @Inject()(cc: AdvertControllerComponents)(
 
   def add: Action[AnyContent] = AdvertAction.async { implicit request =>
     logger.trace("process: ")
-    println("INSIDE Controller PROCESS")
     processJsonPost()
   }
 
@@ -86,14 +85,33 @@ class AdvertController @Inject()(cc: AdvertControllerComponents)(
     implicit request: AdvertRequest[A]): Future[Result] = {
 
     def failure(badForm: Form[Advert]) = {
-      println("INSIDE FAILURE")
       Future.successful(BadRequest(badForm.errorsAsJson))
     }
 
 
     def success(input: Advert) = {
-      println("INSIDE SUCCESS new is ")
       advertResourceHandler.add(input).map { ret =>
+        Created(Json.toJson("success")).withHeaders()
+      }
+    }
+    computerForm.bindFromRequest().fold(failure, success)
+  }
+
+  def update(id:Int): Action[AnyContent] = AdvertAction.async { implicit request =>
+    logger.trace("process: ")
+    processJsonPostUpdate(id)
+  }
+
+  private def processJsonPostUpdate[A](id:Int)(
+    implicit request: AdvertRequest[A]): Future[Result] = {
+
+    def failure(badForm: Form[Advert]) = {
+      Future.successful(BadRequest(badForm.errorsAsJson))
+    }
+
+
+    def success(input: Advert) = {
+      advertResourceHandler.update(id,input).map { ret =>
         Created(Json.toJson("success")).withHeaders()
       }
     }

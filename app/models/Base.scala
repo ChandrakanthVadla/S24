@@ -11,7 +11,7 @@ object Fuel extends Enumeration {
 }
 
 final case class Advert(
-                        id: Option[Int],
+                        id: Option[Int], //TODO: remove the option
                         title: String,
                         fuel: Fuel,
                         price: Int,
