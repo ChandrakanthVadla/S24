@@ -1,0 +1,66 @@
+@(id: Int, advertForm: Form[Advert], companies : Seq[(String, String)])(implicit requestHeader: MessagesRequestHeader)
+
+@import views.html.helper._
+
+@main {
+<script type="text/javascript">
+  window.onload = function(e) {
+    document.getElementById("isNewCheck").onclick = function() {
+      showHideElement();
+    };
+    showHideElement();
+  }
+
+  function showHideElement() {
+    var checked = document.getElementById("isNewCheck").checked;
+    var el1 = document.getElementById("mileageInput");
+    var el2 = document.getElementById("firstRegInput");
+    if (checked) {
+      el1.style.display = 'none'
+      el2.style.display = 'none'
+    } else {
+      el1.style.display = 'block'
+      el2.style.display = 'block'
+    }
+  }
+</script>
+
+<h1>Edit advert</h1>
+
+@form(routes.HomeController.update(id)) {
+
+<fieldset>
+    @CSRF.formField
+    @inputText(advertForm("title"), '_label -> "Title", '_help -> "")
+
+    @select(
+    advertForm("fuel"),
+    companies,
+    '_label -> "Fuel", '_default -> "-- Choose a fuel type --",
+    '_showConstraints -> true
+    )
+    @inputText(advertForm("price"),  '_label -> "Price", '_help -> "", '_showConstraints -> false)
+    @checkbox(advertForm("isNew"), 'id -> "isNewCheck", '_label -> "New", '_help -> "")
+
+    @inputText(advertForm("mileage"), 'id -> "mileageInput", '_label -> "Mileage", '_help -> "")
+    @inputText(advertForm("first_registration"), 'id -> "firstRegInput", '_label -> "First Registration", '_help -> "" )
+
+
+
+
+</fieldset>
+<p>Dates are in yyyy-MM-dd format</p>
+
+<div class="actions">
+    <input type="submit" value="Save this advert" class="btn primary"> or
+    <a href="@routes.HomeController.list()" class="btn">Cancel</a>
+</div>
+
+}
+
+@form(routes.HomeController.delete(id), 'class -> "topRight") {
+@CSRF.formField
+<input type="submit" value="Delete this advert" class="btn danger">
+}
+
+}
