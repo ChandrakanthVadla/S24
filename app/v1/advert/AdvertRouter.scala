@@ -12,9 +12,15 @@ class AdvertRouter @Inject()(controller: AdvertController) extends SimpleRouter 
   val prefix = "/v1/adverts"
   override def routes: Routes = {
 
+
+    case GET(p"/" ? q_?"sort=$sort") =>
+    {
+      controller.index(sort.getOrElse("id"))
+    }
     case GET(p"/") =>
     {
-      controller.index
+      print("Inside GET/")
+      controller.index()
     }
     case GET(p"/$id") =>
     {

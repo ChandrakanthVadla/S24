@@ -40,17 +40,21 @@ class AdvertController @Inject()(cc: AdvertControllerComponents)(
       "title" -> nonEmptyText,
       "fuel" -> Forms.of[Fuel],
       "price" -> number,
-      "isNew" -> boolean,
+      "new" -> boolean,
       "mileage" -> optional(number),
       "firstRegistration" -> optional(localDate("yyyy-MM-dd"))
     )(Advert.apply)(Advert.unapply)
   )
 
 
-  def index: Action[AnyContent] = AdvertAction.async { implicit request =>
+  def index(sortBy: String = "id"): Action[AnyContent] = AdvertAction.async { implicit request =>
     logger.trace("index: ")
-    println("Inside index of Advert Controller")
-    advertResourceHandler.find.map { posts =>
+    val sort = sortBy match {
+      case "title" | "fuel" | "price" | "new" => sortBy
+      case _ => "id"
+    }
+    println("SORTBY IS ", sort)
+    advertResourceHandler.listAll(sort).map { posts =>
       Ok(Json.toJson(posts))
     }
   }

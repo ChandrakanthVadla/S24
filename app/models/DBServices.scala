@@ -98,12 +98,12 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
     Future.successful(Page(items, page, offset, totalRows))
   }
 
-  override def listAll(sort: Int): Future[Seq[Advert]] = {
+  override def listAll(sort: String = "id"): Future[Seq[Advert]] = {
     val action = sort match {
-      case 2 => carAds.sortBy(_.title).result
-      case 3 => carAds.sortBy(_.fuel).result
-      case 4 => carAds.sortBy(_.price).result
-      case 5 => carAds.sortBy(_.`new`).result
+      case "title" => carAds.sortBy(_.title).result
+      case "fuel" => carAds.sortBy(_.fuel).result
+      case "price" => carAds.sortBy(_.price).result
+      case "new" => carAds.sortBy(_.`new`).result
       case _ => carAds.sortBy(_.id).result
     }
     db.run(action)

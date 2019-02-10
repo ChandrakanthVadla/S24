@@ -58,9 +58,9 @@ class AdvertResourceHandler @Inject()(
     }
   }
 
-  def find(implicit mc: MarkerContext): Future[Iterable[AdvertResource]] = {
+  def listAll(sort:String = "id")(implicit mc: MarkerContext): Future[Iterable[AdvertResource]] = {
     print("Inside find of AdvertResourceHandler")
-    val modelAdvertList:Seq[models.Advert] = Await.result(dbservices.listAll(1) , Duration.Inf)
+    val modelAdvertList:Seq[models.Advert] = Await.result(dbservices.listAll(sort) , Duration.Inf)
     Future.successful( (modelAdvertList.map(a => createAdvertResource(a))).toIterable )
   }
   def delete(id:Int) =  {
