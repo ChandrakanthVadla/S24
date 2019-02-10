@@ -7,7 +7,9 @@ import java.time.{LocalDate, _}
 
 import javax.inject.Inject
 import models.Fuel.Fuel
+import slick.ast.BaseTypedType
 import slick.jdbc.H2Profile.api._
+import slick.jdbc.JdbcType
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -21,10 +23,10 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
 
   val db = Database.forConfig("h2mem1")
 
-  implicit val fuelEnumMapper =
+  implicit val fuelEnumMapper: JdbcType[Fuel] with BaseTypedType[Fuel] =
     MappedColumnType.base[Fuel, String](_.toString, Fuel.withName)
 
-  implicit val localDateColumnType = MappedColumnType
+  implicit val localDateColumnType: JdbcType[LocalDate] with BaseTypedType[LocalDate] = MappedColumnType
     .base[LocalDate, Timestamp](
     d => Timestamp.from(d.atStartOfDay(ZoneId.systemDefault()).toInstant),
     d => d.toLocalDateTime.toLocalDate
@@ -66,11 +68,14 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
   def sortingFields: Set[String] = sorting.keys.toSet
 
   //def dropSchema(): FixedSqlAction[Unit, NoStream, Effect.Schema] = carAds.schema.drop
-  def totalRows = Await.result(db.run(carAds.map(_.id).length.result), Duration.Inf )
+  def totalRows: Int = Await.result(db.run(carAds.map(_.id).length.result), Duration.Inf )
   /**
     * add a new advertisement
     */
-  override  def add(ca: Advert): Future[Int] = db.run(carAds += ca)
+  override  def add(ca: Advert): Future[Int] = {
+    val row :Advert = Advert( Option(ca.id.getOrElse(totalRows+1)),ca.title,ca.fuel, ca.price,ca.`new`,ca.mileage,ca.firstRegistration)
+    db.run(carAds += row)
+  }
 
   override  def selectAll(page: Int = 0, pageSize: Int = 10, sort: Int, filter: String = "%"): Future[Page[Advert]] = {
 
@@ -93,7 +98,16 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
     Future.successful(Page(items, page, offset, totalRows))
   }
 
-  override def listAll(sort: String): Future[Seq[Advert]] = ???
+  override def listAll(sort: Int): Future[Seq[Advert]] = {
+    val action = sort match {
+      case 2 => carAds.sortBy(_.title).result
+      case 3 => carAds.sortBy(_.fuel).result
+      case 4 => carAds.sortBy(_.price).result
+      case 5 => carAds.sortBy(_.`new`).result
+      case _ => carAds.sortBy(_.id).result
+    }
+    db.run(action)
+  }
 
   //override
   def select(id: Int): Future[Option[Advert]] =

@@ -139,9 +139,9 @@ class HomeController @Inject()(dbservices: DBServices,
       ,
       a => {
         println("Inside save", a.id.getOrElse(-1))
-        val data: Advert = Advert(Option(dbservices.totalRows + 1), a.title, a.fuel, a.price, a.`new`, a.mileage, a.firstRegistration)
-        dbservices.add(data).map { _ =>
-          Home.flashing("success" -> "Computer %s has been created".format(data.`new`))
+        //val data: Advert = Advert(Option(dbservices.totalRows + 1), a.title, a.fuel, a.price, a.`new`, a.mileage, a.firstRegistration)
+        dbservices.add(a).map { _ =>
+          Home.flashing("success" -> "Computer %s has been created".format(a.`new`))
         }
       }
     )
