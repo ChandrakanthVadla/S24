@@ -19,12 +19,12 @@ import scala.language.postfixOps
 
 class HomeController @Inject()(dbservices: DBServices,
                                cc: MessagesControllerComponents)(implicit ec: ExecutionContext)
-  extends MessagesAbstractController(cc) {
+  extends MessagesAbstractController(cc) with CORSHandler {
 
   /**
     * This result directly redirect to the application home.
     */
-  val Home = Redirect(routes.HomeController.list(0, 2, ""))
+  val Home: Result = Redirect(routes.HomeController.list(0, 1))
   val fuelTypes = Fuel.values.map(f => (f.toString, f.toString)).toSeq
   val computerForm = Form(
     mapping(
@@ -59,7 +59,7 @@ class HomeController @Inject()(dbservices: DBServices,
     * Handle default path requests, redirect to computers list
     */
   def index = Action {
-    dbservices.createSchema()
+    println("Entred The Index")
     Home
   }
 
@@ -70,9 +70,9 @@ class HomeController @Inject()(dbservices: DBServices,
     * @param orderBy Column to be sorted
     * @param filter  Filter applied on advertisement titles
     */
-  def list(page: Int, orderBy: Int, filter: String) = Action.async { implicit request =>
+  def list(page:Int = 0, orderBy:Int = 1, filter:String = "") = Action.async { implicit request =>
 
-    println(filter)
+    println("Inside The list function")
 
     dbservices.selectAll(page, 10, orderBy, filter).map { page =>
       Ok(html.list(page, orderBy, filter))

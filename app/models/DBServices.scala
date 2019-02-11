@@ -60,9 +60,7 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
     "first_registration" -> carAds.sortBy(_.firstRegistration)
   )
 
-  override  def createSchema(): Future[Unit] = {
-    db.run(carAds.schema.create)
-  }
+  override  def createSchema(): Future[Unit] =  db.run(carAds.schema.create)
 
   override
   def sortingFields: Set[String] = sorting.keys.toSet
@@ -73,12 +71,13 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
     * add a new advertisement
     */
   override  def add(ca: Advert): Future[Int] = {
+    createSchema()
     val row :Advert = Advert( Option(ca.id.getOrElse(totalRows+1)),ca.title,ca.fuel, ca.price,ca.`new`,ca.mileage,ca.firstRegistration)
     db.run(carAds += row)
   }
 
   override  def selectAll(page: Int = 0, pageSize: Int = 10, sort: Int, filter: String = "%"): Future[Page[Advert]] = {
-
+    createSchema()
     val offset = pageSize * page
 
     val sortBy:String = sort match {
@@ -99,6 +98,7 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
   }
 
   override def listAll(sort: String = "id"): Future[Seq[Advert]] = {
+    createSchema()
     val action = sort match {
       case "title" => carAds.sortBy(_.title).result
       case "fuel" => carAds.sortBy(_.fuel).result
@@ -110,15 +110,20 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
   }
 
   //override
-  def select(id: Int): Future[Option[Advert]] =
+  def select(id: Int): Future[Option[Advert]] ={
+    createSchema()
     db.run(carAds.filter(_.id === id).take(1).result.headOption)
+  }
 
   override  def update(id: Int, row: Advert): Future[Int] = {
-    println("Inside DBSERvices with ", id)
+    createSchema()
     val r:Advert = Advert(Option(id), row.title, row.fuel,row.price, row.`new`, row.mileage, row.firstRegistration)
     db.run(carAds.filter(_.id === id).update(r))
   }
 
-  override  def delete(id: Int): Future[Int] = db.run(carAds.filter(_.id === id).delete)
+  override  def delete(id: Int): Future[Int] = {
+    createSchema()
+    db.run(carAds.filter(_.id === id).delete)
+  }
 
 }

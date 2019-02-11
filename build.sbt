@@ -19,8 +19,8 @@ libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.1
 libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % "3.0.1.1" % Test
 libraryDependencies += "io.gatling" % "gatling-test-framework" % "3.0.1.1" % Test
 
-libraryDependencies +=  "org.typelevel" %% "cats-core" % "1.4.0"
-libraryDependencies +=  "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
+libraryDependencies += "org.typelevel" %% "cats-core" % "1.4.0"
+libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.9.0"
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"
 libraryDependencies += "org.postgresql" % "postgresql" % "9.4-1203-jdbc4"
 //libraryDependencies += "com.typesafe.slick" %% "slick" % "3.2.3"
