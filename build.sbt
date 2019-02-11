@@ -34,7 +34,7 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test
 libraryDependencies += "com.dimafeng" %% "testcontainers-scala" % "0.20.0" % Test
 libraryDependencies += "org.testcontainers" % "postgresql" % "1.9.1" % Test
 libraryDependencies += "com.h2database" % "h2" % "1.4.197"
-
+libraryDependencies += javaJdbc % Test
 
 libraryDependencies += "com.typesafe.play" %% "play-slick" % "3.0.0"
 libraryDependencies += "com.h2database" % "h2" % "1.4.197" % Test

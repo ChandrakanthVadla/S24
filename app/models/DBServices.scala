@@ -10,6 +10,7 @@ import models.Fuel.Fuel
 import slick.ast.BaseTypedType
 import slick.jdbc.H2Profile.api._
 import slick.jdbc.JdbcType
+import slick.jdbc.meta.MTable
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -60,7 +61,12 @@ class DBServices @Inject() (implicit ec: ExecutionContext)  extends Dao[Advert, 
     "first_registration" -> carAds.sortBy(_.firstRegistration)
   )
 
-  override  def createSchema(): Future[Unit] =  db.run(carAds.schema.create)
+  override  def createSchema(): Future[Unit] =  {
+    val tablesInDB =Await.result(db.run(MTable.getTables), Duration.Inf).toList
+    if(tablesInDB.isEmpty)  db.run(carAds.schema.create)
+    else  Future(None)
+
+  }
 
   override
   def sortingFields: Set[String] = sorting.keys.toSet

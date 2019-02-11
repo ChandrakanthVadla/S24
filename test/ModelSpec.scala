@@ -6,8 +6,10 @@ import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 
 import scala.concurrent.Await
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-
+//import scala.concurrent.ExecutionContext.Implicits.global
+import scala.util.{Failure, Success}
 
 
 class ModelSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures {
@@ -16,23 +18,35 @@ class ModelSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures {
 
   // -- Date helpers
 
-  def dateIs(date: java.util.Date, str: String): Boolean = {
-    new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str
+  def dateIs(date: java.time.LocalDate, str: String): Boolean = {
+    date.toString == str
   }
-
-  // --
 
   def dbService: DBServices = app.injector.instanceOf(classOf[DBServices])
 
-  "Computer model" should {
+  "Advertisement model " should {
+
+    var id = 0
+    dbService.createSchema().onComplete {
+      case Failure(e) => e.printStackTrace()
+      case Success(_) => {
+        id = dbService.totalRows+1
+        val newRec: Advert = Advert(Option(id), "Mini Cooper", Fuel.Diesel, 100, `new` = false, Option(5), Option(LocalDate.of(2001, 10, 10)))
+        dbService.add(newRec).onComplete {
+          case Failure(exception) => exception.printStackTrace
+          case Success(value) => println("success", value)
+        }
+      }
+    }
 
     "be retrieved by id" in {
-      whenReady(dbService.select(21)) { maybeComputer =>
-        val macintosh = maybeComputer.get
-
-        macintosh.title must equal("Macintosh")
-        macintosh.firstRegistration.value must matchPattern {
-          case date: java.util.Date if dateIs(date, "1984-01-24") =>
+      whenReady(dbService.select(id)) {
+        case None =>
+        case Some(someAd) => {
+          someAd.title must equal("Mini Cooper")
+          someAd.firstRegistration.value must matchPattern {
+            case date: java.time.LocalDate if dateIs(date, "2001-10-10") =>
+          }
         }
       }
     }
@@ -40,20 +54,22 @@ class ModelSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures {
 
     "be updated if needed" in {
 
-      val newRec: Advert = {
-        Advert(Option(1), "Hummer", Fuel.Diesel, 100, `new` = false, Option(5), Option(LocalDate.of(2001, 10, 10)))
-      }
-      dbService.add(newRec)
-
-      val row: Advert = Await.result(dbService.select(dbService.totalRows), Duration.Inf).get
-      val rowNew = Advert(row.id, "New " + row.title, row.fuel, row.price - 10, row.`new`, row.mileage, row.firstRegistration)
-      val rowUpdate = dbService.update(row.id.get, rowNew)
+      val lastRec = Await.result(dbService.select(id), Duration.Inf).get
+      val newRec = Advert(lastRec.id, "Mega Cooper", lastRec.fuel, lastRec.price - 10, lastRec.`new`, lastRec.mileage, lastRec.firstRegistration)
+      val rowUpdate = dbService.update(lastRec.id.get, newRec)
 
 
       whenReady(rowUpdate) { numOfUpdatesRows =>
         numOfUpdatesRows must equal(1)
       }
 
+      whenReady(dbService.select(lastRec.id.get)) { mayBeUpdatedRec =>
+        val updatedRec = mayBeUpdatedRec.get
+        updatedRec.id.get must equal(newRec.id.get)
+        updatedRec.title must equal(newRec.title)
+      }
     }
+
+
   }
 }
