@@ -51,54 +51,51 @@ select sbt Task in the left panel and give some Name and put ~run in Tasks
 Run -> run 'Name'
 ```
 
-From browser:
+#####From browser:
 ```
 http://localhost:9000/
 ```
 
 
-using CURL for RESTful apis
+##### using CURL for RESTful apis
 
-List all car advert
+######List all car advert
  ```
  curl http://localhost:9000/v1/adverts
 ```
-List all car advert with sort field
+######List all car advert with sort field
 ```
 curl http://localhost:9000/v1/adverts?sort=fieldName
 ```
 
-Single car advert
+######Single car advert
 ```
-curl http://localhost:9000/v1/adverts
+curl http://localhost:9000/v1/adverts/id
 ```
-Add car advert
+######Add car advert
 ```
 curl -X POST -i -d @request.json -H "Content-Type: application/json"  http://localhost:9000/v1/adverts/
+curl -X POST -i -d '{"title": "MINI Cooper Clubman ","fuel": "Diesel","price": 26000,"new": true}' -H "Content-Type: application/json"  http://localhost:9000/v1/adverts/
 ```
-Modify car advert by id 
+######Modify car advert by id 
 ```
 curl -X PUT -d @request.json -H "Content-Type: application/json"  http://localhost:9000/v1/adverts/id 
 ```
-Delete car advert by id 
+######Delete car advert by id 
 ```curl -X "DELETE"  http://localhost:9000/v1/adverts/id
 ```
 
 request.json 
 example 1
 {
-"id":20,
-"title": "MINI Cooper Countryman",
-"fuel": "Diesel",
-"price": 26000,
-"new": false,
-"mileage":0,
-"first_registration":""
+    "title": "MINI Cooper Countryman",
+    "fuel": "Diesel",
+    "price": 26000,
+    "new": true
 }
 
 example 2
 {
-    "id":21,
     "title": "MINI Cooper Countryman",
     "fuel": "Diesel",
     "price": 26000,
@@ -117,25 +114,6 @@ testOnly FunctionalSpec
 testOnly BrowserSpec    
 ```
 
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
 
 ## Built With
 
