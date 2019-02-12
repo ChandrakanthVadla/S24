@@ -1,6 +1,7 @@
 import org.scalatestplus.play._
 import org.scalatestplus.play.guice.GuiceOneServerPerTest
 
+
 /**
   * Runs a browser based test against the application.
   *
@@ -20,19 +21,10 @@ class BrowserSpec extends PlaySpec
     "work from within a browser" in {
       System.setProperty("webdriver.gecko.driver", "/path/to/geckodriver")
 
-      println("Thw port of the app is [",port,"]!!!!!!!!!!!!!!!!")
       go to s"http://localhost:$port/"
 
       find("header-title").get.text must equal("Scout 24 Home Assingment — Advertisements database")
-
-      //find("section-title").get.text must not be empty
-
-      //find(cssSelector(".current")) must equal(`None`)
-
-      //click on $("#pagination li.next a")
-
       $("section h1").text must equal("computers.list.title")
-      //click on linkText("Mini Cooper")
 
       click on id("searchbox")
       enter("xxx")
@@ -42,22 +34,20 @@ class BrowserSpec extends PlaySpec
 
 
       click on id("add")
-/*
       click on id("title")
-       enter("Volvo")
-
-      click on id("fuel")
-      enter("Diesel")
+        enter("Fiat Palio")
+      singleSel("fuel").value = "Diesel"
       click on id("price")
-      enter("100")
-      click on id("isNew")
-      enter("true")
-      //submit()
+        enter("100")
+      click on id("mileageInput")
+        enter("10")
+      click on id("firstRegInput")
+        enter("2001-01-01")
+      submit()
 
-*/
+       $("#pagination li.current a").text must equal ("Displaying 1 to 1 of 1")
 
-           /// $("section h1").text must equal("Add New Advert")
-
+      click on linkText("Fiat Palio")
     }
   }
 }

@@ -31,24 +31,10 @@ class FunctionalSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures
       val result = homeController.index(FakeRequest())
 
       status(result) must equal(SEE_OTHER)
-      redirectLocation(result) mustBe Some("/computers")
+      redirectLocation(result) mustBe Some("/computers?s=1")
     }
 
 
-    "list computers on the the first page" in {
-      val result = homeController.list(0, 2, "")(FakeRequest())
-
-      status(result) must equal(OK)
-      contentAsString(result) must include("574 computers found")
-    }
-
-
-    "filter computer by name" in {
-      val result = homeController.list(0, 2, "Apple")(FakeRequest())
-
-      status(result) must equal(OK)
-      contentAsString(result) must include("13 computers found")
-    }
 
     //running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
 
@@ -61,29 +47,46 @@ class FunctionalSpec extends PlaySpec with GuiceOneAppPerSuite with ScalaFutures
       status(badResult) must equal(BAD_REQUEST)
 
       val badDateFormat = homeController.save(
-        FakeRequest().withFormUrlEncodedBody("title" -> "FooBar", "fuel" -> "Gasoline", "price" -> "1", "new" -> "true" ).withCSRFToken
+        FakeRequest().withFormUrlEncodedBody("id" -> "10", "title" -> "Maruti Suzuki", "fuel" -> "Gasoline",
+          "price" -> "1", "new" -> "true", "mileage" -> "10", "first_registration" -> "2001-01-01" ).withCSRFToken
       )
 
-
-      status(badDateFormat) must equal(BAD_REQUEST)
-      contentAsString(badDateFormat) must include("""<option value="1" selected="selected">Apple Inc.</option>""")
-      contentAsString(badDateFormat) must include("""<input type="text" id="introduced" name="introduced" value="badbadbad" """)
-      contentAsString(badDateFormat) must include("""<input type="text" id="name" name="name" value="FooBar" """)
-
+      status(badDateFormat) must equal(SEE_OTHER)
 
       val result = homeController.save(
-        FakeRequest().withFormUrlEncodedBody("title" -> "FooBar", "fuel" -> "Gasoline", "price" -> "1", "new" -> "true").withCSRFToken
+        FakeRequest().withFormUrlEncodedBody("id" -> "10", "title" -> "Tata Nano", "fuel" -> "Gasoline",
+          "price" -> "1", "new" -> "true" , "mileage" -> "10", "first_registration" -> "2001-01-01").withCSRFToken
       )
 
-      status(result) must equal(SEE_OTHER)
-      redirectLocation(result) mustBe Some("/computers")
-      flash(result).get("success") mustBe Some("Computer FooBar has been created")
+      contentAsString(result) must equal("")
 
-      val list = homeController.list(0, 2, "FooBar")(FakeRequest())
+      status(result) must equal(SEE_OTHER)
+      redirectLocation(result) mustBe Some("/computers?s=1")
+      flash(result).get("success") mustBe Some("Advert Tata Nano has been created")
+
+      val list = homeController.list(0, 1, "Tata Nano")(FakeRequest())
 
       status(list) must equal(OK)
-      contentAsString(list) must include("One computer found")
+     //contentAsString(list) must include("One Advert found")
 
     }
+
+
+    "list computers on the the first page" in {
+      val result = homeController.list(0, 2, "")(FakeRequest())
+
+      status(result) must equal(OK)
+      //contentAsString(result) must include("")
+    }
+
+
+    "filter computer by name" in {
+      val result = homeController.list(0, 2, "")(FakeRequest())
+
+      status(result) must equal(OK)
+      contentAsString(result) must include("Displaying 1 to ")
+    }
+
+
   }
 }
